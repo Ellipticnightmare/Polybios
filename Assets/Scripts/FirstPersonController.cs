@@ -12,6 +12,7 @@ public class FirstPersonController : MonoBehaviour
     public int hSpeed, vSpeed, baseSpeed;
     public Image cScreen;
     public Sprite monsterCursor, interactCursor, pickupCursor;
+    public AudioClip needQuarter, gainQuarter;
     #endregion
     #region Protected
     CharacterController control;
@@ -45,6 +46,7 @@ public class FirstPersonController : MonoBehaviour
             KeyCode down = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Down"));
             KeyCode interact = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Interact"));
             KeyCode crouch = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Crouch"));
+            KeyCode flashlight = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Flashlight"));
 
             float lNorm = (Input.GetKey(left)) ? 1 : 0;
             float rNorm = (Input.GetKey(right)) ? 1 : 0;
@@ -68,6 +70,11 @@ public class FirstPersonController : MonoBehaviour
             {
                 if (Input.GetMouseButtonDown((int)interact))
                     RunInteract();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                GameManager.FirePause();
             }
         }
         else //Controller specific logic
@@ -103,6 +110,26 @@ public class FirstPersonController : MonoBehaviour
     }
     public void RunInteract()
     {
-
+        Ray ray = Camera.main.ViewportPointToRay(new Vector3(.5f, .5f, 0));
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 15))
+        {
+            switch (hit.collider.gameObject.tag.ToString())
+            {
+                case "cabinet":
+                    if (GameManager.HasQuarter())
+                        GameManager.FireStartCabinet();
+                    else
+                        GameManager.FireAudioLine(needQuarter);
+                    break;
+                case "quarter":
+                    if (!GameManager.HasQuarter())
+                    {
+                        GameManager.FireAudioBit(gainQuarter);
+                        GameManager.quarterCount++;
+                    }
+                    break;
+            }
+        }
     }
 }
