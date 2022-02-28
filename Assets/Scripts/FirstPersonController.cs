@@ -11,8 +11,9 @@ public class FirstPersonController : MonoBehaviour
     [Range(1, 5)]
     public int hSpeed, vSpeed, baseSpeed;
     public Image cScreen;
-    public Sprite monsterCursor, interactCursor, pickupCursor;
+    public Color defaultCursor, monsterCursor, interactCursor, pickupCursor;
     public AudioClip needQuarter, gainQuarter;
+    public Camera mainCam;
     #endregion
     #region Protected
     CharacterController control;
@@ -22,95 +23,89 @@ public class FirstPersonController : MonoBehaviour
     #endregion
     #endregion
     // Start is called before the first frame update
-    void Start()
+    public void Setup()
     {
         #region Basic
         control = this.GetComponent<CharacterController>();
+        mainCam.enabled = true;
         #endregion
     }
 
     // Update is called once per frame
     void Update()
     {
-        #region Basic
-        isController = GameManager.isController;
-        tMod = GameManager.tMod;
-        float hInput = 0;
-        float vInput = 0;
-        float movSpeed = 0;
-        if (!isController) //Keyboard specific logic
+        if (control != null)
         {
-            KeyCode right = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Right"));
-            KeyCode left = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Left"));
-            KeyCode up = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Up"));
-            KeyCode down = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Down"));
-            KeyCode interact = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Interact"));
-            KeyCode crouch = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Crouch"));
-            KeyCode flashlight = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Flashlight"));
-
-            float lNorm = (Input.GetKey(left)) ? 1 : 0;
-            float rNorm = (Input.GetKey(right)) ? 1 : 0;
-            float uNorm = (Input.GetKey(up)) ? 1 : 0;
-            float dNorm = (Input.GetKey(down)) ? 1 : 0;
-
-            hInput = lNorm - rNorm;
-            vInput = uNorm - dNorm;
-
-            movSpeed = Input.GetKey(crouch) ? baseSpeed * .45f : baseSpeed;
-
-            this.gameObject.transform.Rotate(new Vector3(0, Input.GetAxisRaw("Mouse X") * tMod, 0));
-            Camera.main.transform.Rotate(new Vector3(-(Input.GetAxisRaw("Mouse Y") * tMod), 0, 0));
-
-            if (PlayerPrefs.GetString("Interact").Length > 1)
+            isController = GameManager.isController;
+            tMod = GameManager.tMod;
+            float hInput = 0;
+            float vInput = 0;
+            float movSpeed = 0;
+            if (!isController) //Keyboard specific logic
             {
+                KeyCode right = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Right"));
+                KeyCode left = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Left"));
+                KeyCode up = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Up"));
+                KeyCode down = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Down"));
+                KeyCode interact = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Interact"));
+                KeyCode crouch = (KeyCode)System.Enum.Parse(typeof(KeyCode), PlayerPrefs.GetString("Crouch"));
+
+                float lNorm = (Input.GetKey(left)) ? 1 : 0;
+                float rNorm = (Input.GetKey(right)) ? 1 : 0;
+                float uNorm = (Input.GetKey(up)) ? 1 : 0;
+                float dNorm = (Input.GetKey(down)) ? 1 : 0;
+
+                hInput = rNorm - lNorm;
+                vInput = uNorm - dNorm;
+
+                movSpeed = Input.GetKey(crouch) ? baseSpeed * .45f : baseSpeed;
+
+                this.gameObject.transform.Rotate(new Vector3(0, Input.GetAxisRaw("Mouse X") * hSpeed * tMod, 0));
+                mainCam.transform.Rotate(new Vector3(-(Input.GetAxisRaw("Mouse Y") * vSpeed * tMod), 0, 0));
+
                 if (Input.GetKeyDown(interact))
                     RunInteract();
+
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    GameManager.FirePause();
+                }
+            }
+            else //Controller specific logic
+            {
+
+            }
+            Ray ray = mainCam.ViewportPointToRay(new Vector3(.5f, .5f, 0));
+            RaycastHit hit;
+            if (Physics.Raycast(ray, out hit, 15))
+            {
+                switch (hit.collider.gameObject.layer)
+                {
+                    case 8: //Monster
+                        cScreen.color = monsterCursor;
+                        break;
+                    case 9: //Interact
+                        cScreen.color = interactCursor;
+                        break;
+                    case 10: //Item
+                        cScreen.color = pickupCursor;
+                        break;
+                    default:
+                        cScreen.color = defaultCursor;
+                        break;
+                }
             }
             else
-            {
-                if (Input.GetMouseButtonDown((int)interact))
-                    RunInteract();
-            }
+                cScreen.color = defaultCursor;
 
-            if (Input.GetKeyDown(KeyCode.Escape))
-            {
-                GameManager.FirePause();
-            }
+            Vector3 moveDirection = this.transform.TransformDirection(hInput, 0, vInput);
+            control.Move(moveDirection * movSpeed * Time.deltaTime * tMod);
         }
-        else //Controller specific logic
-        {
-
-        }
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(.5f, .5f, 0));
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, 15))
-        {
-            switch (hit.collider.gameObject.layer)
-            {
-                case 8: //Monster
-                    cScreen.sprite = monsterCursor;
-                    break;
-                case 9: //Interact
-                    cScreen.sprite = interactCursor;
-                    break;
-                case 10: //Item
-                    cScreen.sprite = pickupCursor;
-                    break;
-                default:
-                    cScreen.sprite = null;
-                    break;
-            }
-        }
-        else
-            cScreen.sprite = null;
-
-        Vector3 moveDirection = this.transform.TransformDirection(hInput, 0, vInput);
-        control.Move(moveDirection * movSpeed * Time.deltaTime * tMod);
-        #endregion
     }
     public void RunInteract()
     {
-        Ray ray = Camera.main.ViewportPointToRay(new Vector3(.5f, .5f, 0));
+        callBackLogger.sendMessage("firing Interact");
+        Ray ray = mainCam.ViewportPointToRay(new Vector3(.5f, .5f, 0));
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 15))
         {

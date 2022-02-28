@@ -3,7 +3,12 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - cabinet
+  - quarter
+  - tree
+  - soldier
+  - hospital
   layers:
   - Default
   - TransparentFX
@@ -13,11 +18,11 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
-  - 
+  - monsters
+  - interactables
+  - items
+  - endCutscene
+  - endActors
   - 
   - 
   - 
