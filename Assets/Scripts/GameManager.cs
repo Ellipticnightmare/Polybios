@@ -23,7 +23,7 @@ public class GameManager : MonoBehaviour
     public GameObject heliObj, fpsObj, levelHolder, keyBindUI, pauseMenu, endActor, mainCanvas, endCanvas;
     public GameObject[] soldierCountDisplay;
     public heliLevel[] heliLevels;
-    public int curHeliLevel = -1;
+    public int curHeliLevel = 0;
     public Button[] keyBindButtons;
     #endregion
     #endregion
@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviour
         directory = Application.persistentDataPath + "/saves/" + PlayerPrefs.GetString("curUser") + ".save";
         Debug.Log(directory);
         StartCoroutine(ReadData());
-        Cursor.visible = true;
+        Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Confined;
         mainCam.enabled = false;
     }
@@ -323,7 +323,7 @@ public class GameManager : MonoBehaviour
         savedSoldierCount = 0;
         Destroy(levelDisplay);
         levelDisplay = Instantiate(heliLevels[curHeliLevel].levelShow, levelHolder.transform);
-        heligameTimer = 180;
+        heligameTimer = 120;
     }
     public void FinishedHeliLevel()
     {
@@ -336,7 +336,7 @@ public class GameManager : MonoBehaviour
             if (curHeliLevel == 4)
                 UpdateGameState();
             levelDisplay = Instantiate(heliLevels[curHeliLevel].levelShow, levelHolder.transform);
-            heligameTimer = 180;
+            heligameTimer = 120;
         }
         else
         {
@@ -348,7 +348,7 @@ public class GameManager : MonoBehaviour
         savedSoldierCount = 0;
         Destroy(levelDisplay);
         levelDisplay = Instantiate(heliLevels[curHeliLevel].levelShow, levelHolder.transform.position, levelHolder.transform.rotation);
-        heligameTimer = 180;
+        heligameTimer = 120;
         heliscore = 0;
         FireEndCabinet();
     }

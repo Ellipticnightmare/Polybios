@@ -82,7 +82,7 @@ public class MainMenuController : MonoBehaviour
             newSave.userName = newName.text;
             newSave.playTime = 0f;
             newSave.keyBindings = defaultKeyBindings.ToArray();
-            newSave.level = -1;
+            newSave.level = 0;
             newSave.polybiosState = "asleep";
             newSave.quarterCount = 0;
             newSave.score = 0;

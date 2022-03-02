@@ -8383,7 +8383,7 @@ PrefabInstance:
         type: 3}
       propertyPath: gainQuarter
       value: 
-      objectReference: {fileID: 8300000, guid: 6c7273f79f23448b297bbff01b78150a, type: 3}
+      objectReference: {fileID: 8300000, guid: f9ce0bd536f6f4244b7151c5ba3c341e, type: 3}
     - target: {fileID: 1183354662088857326, guid: 545154c33b04c1245bae8de6e3dccd6e,
         type: 3}
       propertyPath: needQuarter
@@ -10659,9 +10659,9 @@ MonoBehaviour:
   HeliState: 0
   HeliHealthState: 0
   interactCountdown: 0
-  pickup: {fileID: 0}
-  injured: {fileID: 0}
-  dropoff: {fileID: 0}
+  pickup: {fileID: 8300000, guid: 6c7273f79f23448b297bbff01b78150a, type: 3}
+  injured: {fileID: 8300000, guid: 8d586f56fd7aa49e3a4935fa7514e441, type: 3}
+  dropoff: {fileID: 8300000, guid: 53b3ac3e2478e437ea06485e505fad65, type: 3}
   playArea: {fileID: 721708075}
   speed: 3
 --- !u!61 &1810664059
